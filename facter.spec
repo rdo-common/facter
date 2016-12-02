@@ -20,8 +20,9 @@
 
 Name:           facter
 Version:        2.4.4
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Command and ruby library for gathering system information
+Epoch:          1
 
 Group:          System Environment/Base
 License:        ASL 2.0
@@ -115,6 +116,9 @@ rspec spec
 
 
 %changelog
+* Thu Sep 15 2016 Jon Schlueter <jschluet@redhat.com> 1:2.4.4-4
+- Bump Epoch to align with el7sat build epoch - rhbz#1376405 and rhbz#1376406
+
 * Wed Feb 03 2016 Fedora Release Engineering <releng@fedoraproject.org> - 2.4.4-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_24_Mass_Rebuild
 
