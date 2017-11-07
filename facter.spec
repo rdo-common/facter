@@ -1,26 +1,6 @@
-# F-17 and above have ruby-1.9.x, and place libs in a different location
-%if 0%{?fedora} >= 17 || 0%{?rhel} >= 7
-%global facter_libdir   %(ruby -rrbconfig -e 'puts RbConfig::CONFIG["vendorlibdir"]')
-%else
-%global facter_libdir   %(ruby -rrbconfig -e 'puts RbConfig::CONFIG["sitelibdir"]')
-%endif
-
-# Only enable checks on F-19, other releases fail for various reasons
-%if (0%{?fedora} >= 17 && 0%{?fedora} <= 19)
-%global enable_check 1
-%else
-%global enable_check 0
-%endif
-
-%global ruby_version    %(ruby -rrbconfig -e 'puts RbConfig::CONFIG["ruby_version"]')
-
-# There is nothing useful in debuginfo, facter is only an arch package to
-# allow arch-dependent requires.
-%global debug_package %{nil}
-
 Name:           facter
-Version:        2.4.4
-Release:        6%{?dist}
+Version:        3.9.3
+Release:        1%{?dist}
 Summary:        Command and ruby library for gathering system information
 
 Group:          System Environment/Base
@@ -28,34 +8,39 @@ License:        ASL 2.0
 URL:            https://puppetlabs.com/%{name}
 Source0:        https://downloads.puppetlabs.com/%{name}/%{name}-%{version}.tar.gz
 Source1:        https://downloads.puppetlabs.com/%{name}/%{name}-%{version}.tar.gz.asc
-BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+Patch0:         shared_cpp_hcon.patch
 
-# Upstream claims to only support 1.8.7 and higher
-BuildRequires:  ruby >= 1.8.7
-BuildRequires:  ruby-devel
-%if %{enable_check}
-BuildRequires:  net-tools
-BuildRequires:  rubygem(mocha)
-BuildRequires:  rubygem(rspec-core)
-BuildRequires:  rubygem(rspec)
-%endif
 
-# dmidecode and pciutils are not available on all arches
-%ifarch %ix86 x86_64 ia64
-Requires:       dmidecode
-Requires:       pciutils
-Requires:       virt-what
-%endif
-Requires:       net-tools
-# Work around the lack of ruby in the default mock buildroot
-%if "%{ruby_version}"
-%if 0%{?fedora} >= 19 || 0%{?rhel} >= 7
-Requires:       ruby(release)
+%if 0%{?fedora}
+BuildRequires: boost-devel
+BuildRequires: cmake
 %else
-Requires:       ruby(abi) = %{ruby_version}
+BuildRequires: boost157-devel
+BuildRequires: cmake3
 %endif
-%endif
-Requires:       which
+BuildRequires: openssl-devel
+BuildRequires: yaml-cpp-devel
+BuildRequires: libblkid-devel
+BuildRequires: libcurl-devel
+BuildRequires: gcc-c++ make
+BuildRequires: wget
+BuildRequires: tar
+BuildRequires: gettext
+BuildRequires: leatherman-devel
+BuildRequires: cpp-hocon-devel
+BuildRequires: ruby-devel
+
+# autoreq is not picking this one up so be specific
+Requires: leatherman
+
+%package devel
+Requires:  %{name}%{?_isa} = %{version}-%{release}
+Summary: Development libraries for building against facter
+
+%package -n ruby-%{name}
+Requires:  %{name}%{?_isa} = %{version}-%{release}
+Requires: ruby
+Summary: ruby bindings for facter
 
 %description
 Facter is a lightweight program that gathers basic node information about the
@@ -68,53 +53,77 @@ custom or site specific. It is easy to extend by including your own custom
 facts. Facter can also be used to create conditional expressions in Puppet that
 key off the values returned by facts.
 
+%description devel
+The headers to link against libfacter in other applications.
+
+%description -n ruby-%{name}
+The ruby bindings for libfacter.
+
 %prep
-%setup -q
+%autosetup -p1
 
 %build
-# Nothing to build
-
+%if 0%{?fedora}
+%cmake -DCMAKE_BUILD_TYPE=Debug \
+       -DLIBFACTER_INSTALL_DESTINATION=%{_lib} \
+       -DCMAKE_INSTALL_PREFIX=%{_prefix}
+%else
+%cmake3 -DBOOST_INCLUDEDIR=/usr/include/boost157 \
+        -DBOOST_LIBRARYDIR=%{_libdir}/boost157 \
+        -DLIBFACTER_INSTALL_DESTINATION=%{_lib} \
+        -DCMAKE_BUILD_TYPE=Debug \
+        -DCMAKE_INSTALL_PREFIX=%{_prefix} \
+        -DLeatherman_DIR=%{_libdir}/cmake3/leatherman
+%endif
+%make_build
+# facter hardcode the path to lib, so set it correctly on other platforms
+sed -i 's#set(LIBFACTER_INSTALL_DESTINATION lib)#set(LIBFACTER_INSTALL_DESTINATION %{_lib})#' lib/CMakeLists.txt
 
 %install
-rm -rf %{buildroot}
-ruby install.rb --destdir=%{buildroot} --quick --no-rdoc --sitelibdir=%{facter_libdir}
-
-# Create directory for external facts
-mkdir -p %{buildroot}/%{_sysconfdir}/%{name}/facts.d
-
-%if ! (0%{?fedora} || 0%{?rhel} >= 7)
-# Install man page, rubygem-rdoc is not available on older EL releases)
-install -D -pv -m 644 man/man8/%{name}.8 %{buildroot}/%{_mandir}/man8/%{name}.8
-%endif
-
-%postun
-# Work around issues where puppet fails to run after a facter update
-# https://bugzilla.redhat.com/806370
-# http://projects.puppetlabs.com/issues/12879
-if [ "$1" -ge 1 ]; then
-  /sbin/service puppet condrestart >/dev/null 2>&1 || :
-fi
-
-
-%clean
-rm -rf %{buildroot}
-
+%{make_install}
 
 %check
-%if %{enable_check}
-rspec spec
-%endif
+%__make test
 
+%post -p /sbin/ldconfig
+
+%postun -p /sbin/ldconfig
 
 %files
-%doc LICENSE README.md
+%license LICENSE
+%doc README.md
 %{_bindir}/%{name}
-%{_sysconfdir}/%{name}
-%{facter_libdir}/%{name}*
+# Note that leatherman has a hardcoded libfacter.so path for the installation
+# of the library for the bindings: https://tickets.puppetlabs.com/browse/FACT-1772
+%{_libdir}/lib%{name}.so.*
+%{_libdir}/lib%{name}.so
 %{_mandir}/man8/%{name}*
 
+%files devel
+%{_includedir}/%{name}
+
+%files -n ruby-%{name}
+%{ruby_vendorlibdir}/%{name}.rb
 
 %changelog
+* Tue Nov 07 2017 James Hogarth <james.hogarth@gmail.com> - 3.9.3-1
+- new upstream release 3.9.3
+
+* Wed Oct 25 2017 James Hogarth <james.hogarth@gmail.com> - 3.9.2-3
+- Point to correct leatherman directory on cmake3 for epel7
+
+* Thu Oct 19 2017 James Hogarth <james.hogarth@gmail.com> - 3.9.2-2
+- rebuilt
+
+* Wed Oct 04 2017 James Hogarth <james.hogarth@gmail.com> - 3.9.2-1
+- Update to latest upstream version 3.9.2
+
+* Mon Oct 02 2017 James Hogarth <james.hogarth@gmail.com> - 3.9.0-1
+- Update to latest upstream version 3.9.0
+
+* Wed Aug 30 2017 James Hogarth <james.hogarth@gmail.com> - 3.8.0-1
+- Update to latest upstream version 3.8.0
+
 * Wed Aug 02 2017 Fedora Release Engineering <releng@fedoraproject.org> - 2.4.4-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Binutils_Mass_Rebuild
 
@@ -331,11 +340,9 @@ rspec spec
 * Wed Jun 28 2006 David Lutterkort <dlutter@redhat.com> - 1.3.3-1
 - Rebuilt
 
-* Fri Jun 19 2006 Luke Kanies <luke@madstop.com> - 1.3.0-1
+* Mon Jun 19 2006 Luke Kanies <luke@madstop.com> - 1.3.0-1
 - Fixed spec file to work again with the extra memory and processor files.
 - Require ruby(abi). Build as noarch
-
-* Fri Jun 9 2006 Luke Kanies <luke@madstop.com> - 1.3.0-1
 - Added memory.rb and processor.rb
 
 * Mon Apr 17 2006 David Lutterkort <dlutter@redhat.com> - 1.1.4-4
