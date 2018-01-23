@@ -1,6 +1,6 @@
 Name:           facter
 Version:        3.9.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Command and ruby library for gathering system information
 
 Group:          System Environment/Base
@@ -106,6 +106,9 @@ sed -i 's#set(LIBFACTER_INSTALL_DESTINATION lib)#set(LIBFACTER_INSTALL_DESTINATI
 %{ruby_vendorlibdir}/%{name}.rb
 
 %changelog
+* Tue Jan 23 2018 Jonathan Wakely <jwakely@redhat.com> - 3.9.3-2
+- Rebuilt for Boost 1.66
+
 * Tue Nov 07 2017 James Hogarth <james.hogarth@gmail.com> - 3.9.3-1
 - new upstream release 3.9.3
 
