@@ -1,6 +1,6 @@
 Name:           facter
 Version:        3.9.3
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Command and ruby library for gathering system information
 
 Group:          System Environment/Base
@@ -106,6 +106,9 @@ sed -i 's#set(LIBFACTER_INSTALL_DESTINATION lib)#set(LIBFACTER_INSTALL_DESTINATI
 %{ruby_vendorlibdir}/%{name}.rb
 
 %changelog
+* Fri Jul 13 2018 Fedora Release Engineering <releng@fedoraproject.org> - 3.9.3-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_29_Mass_Rebuild
+
 * Wed Feb 14 2018 Richard Shaw <hobbes1069@gmail.com> - 3.9.3-4
 - Rebuild for yaml-cpp 0.6.0.
 
