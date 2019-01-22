@@ -85,9 +85,7 @@ sed -i 's#set(LIBFACTER_INSTALL_DESTINATION lib)#set(LIBFACTER_INSTALL_DESTINATI
 %check
 %__make test
 
-%post -p /sbin/ldconfig
-
-%postun -p /sbin/ldconfig
+%ldconfig_scriptlets
 
 %files
 %license LICENSE
