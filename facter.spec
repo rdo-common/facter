@@ -3,7 +3,6 @@ Version:        3.9.3
 Release:        5%{?dist}
 Summary:        Command and ruby library for gathering system information
 
-Group:          System Environment/Base
 License:        ASL 2.0
 URL:            https://puppetlabs.com/%{name}
 Source0:        https://downloads.puppetlabs.com/%{name}/%{name}-%{version}.tar.gz
