@@ -1,5 +1,13 @@
+%if 0%{?epel}
+%global boost_version 157
+%else
+# CentOS SIGs have newer //-installable Boost
+%global boost_version 159
+%endif
+
 Name:           facter
 Version:        3.9.3
+Epoch:          1
 Release:        6%{?dist}
 Summary:        Command and ruby library for gathering system information
 
@@ -14,7 +22,7 @@ Patch0:         shared_cpp_hcon.patch
 BuildRequires: boost-devel
 BuildRequires: cmake
 %else
-BuildRequires: boost157-devel
+BuildRequires: boost%{?boost_version}-devel
 BuildRequires: cmake3
 %endif
 BuildRequires: openssl-devel
@@ -33,11 +41,11 @@ BuildRequires: ruby-devel
 Requires: leatherman
 
 %package devel
-Requires:  %{name}%{?_isa} = %{version}-%{release}
+Requires:  %{name}%{?_isa} = %{epoch}%{version}-%{release}
 Summary: Development libraries for building against facter
 
 %package -n ruby-%{name}
-Requires:  %{name}%{?_isa} = %{version}-%{release}
+Requires:  %{name}%{?_isa} = %{epoch}%{version}-%{release}
 Requires: ruby
 Summary: ruby bindings for facter
 
@@ -67,8 +75,8 @@ The ruby bindings for libfacter.
        -DLIBFACTER_INSTALL_DESTINATION=%{_lib} \
        -DCMAKE_INSTALL_PREFIX=%{_prefix}
 %else
-%cmake3 -DBOOST_INCLUDEDIR=/usr/include/boost157 \
-        -DBOOST_LIBRARYDIR=%{_libdir}/boost157 \
+%cmake3 -DBOOST_INCLUDEDIR=/usr/include/boost%{?boost_version} \
+        -DBOOST_LIBRARYDIR=%{_libdir}/boost%{?boost_version} \
         -DLIBFACTER_INSTALL_DESTINATION=%{_lib} \
         -DCMAKE_BUILD_TYPE=Debug \
         -DCMAKE_INSTALL_PREFIX=%{_prefix} \
@@ -84,7 +92,12 @@ sed -i 's#set(LIBFACTER_INSTALL_DESTINATION lib)#set(LIBFACTER_INSTALL_DESTINATI
 %check
 %__make test
 
+%if 0%{?fedora} || 0%{?rhel} > 7
 %ldconfig_scriptlets
+%else
+%post -p /sbin/ldconfig
+%postun -p /sbin/ldconfig
+%endif
 
 %files
 %license LICENSE
