@@ -8,7 +8,7 @@
 Name:           facter
 Version:        3.9.3
 Epoch:          1
-Release:        6%{?dist}
+Release:        7%{?dist}
 Summary:        Command and ruby library for gathering system information
 
 License:        ASL 2.0
@@ -41,11 +41,11 @@ BuildRequires: ruby-devel
 Requires: leatherman
 
 %package devel
-Requires:  %{name}%{?_isa} = %{epoch}%{version}-%{release}
+Requires:  %{name}%{?_isa} = %{epoch}:%{version}-%{release}
 Summary: Development libraries for building against facter
 
 %package -n ruby-%{name}
-Requires:  %{name}%{?_isa} = %{epoch}%{version}-%{release}
+Requires:  %{name}%{?_isa} = %{epoch}:%{version}-%{release}
 Requires: ruby
 Summary: ruby bindings for facter
 
@@ -116,6 +116,9 @@ sed -i 's#set(LIBFACTER_INSTALL_DESTINATION lib)#set(LIBFACTER_INSTALL_DESTINATI
 %{ruby_vendorlibdir}/%{name}.rb
 
 %changelog
+* Thu Jun 20 2019 Alfredo Moralejo <amoralej@redhat.com> - 3.9.3-7
+- Fix bug when using epoch for RDO build.
+
 * Thu Jan 31 2019 Fedora Release Engineering <releng@fedoraproject.org> - 3.9.3-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_30_Mass_Rebuild
 
