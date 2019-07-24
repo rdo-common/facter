@@ -1,45 +1,46 @@
+%if 0%{?rhel} && 0%{?rhel} <= 7
+%global boost_suffix 169
+%global cmake_suffix 3
+%global cmake %%cmake%{?cmake_suffix}
+%endif
+
 Name:           facter
-Version:        3.9.3
-Release:        7%{?dist}
+Version:        3.14.2
+Release:        1%{?dist}
 Summary:        Command and ruby library for gathering system information
 
 License:        ASL 2.0
-URL:            https://puppetlabs.com/%{name}
+URL:            https://puppetlabs.com/facter
 Source0:        https://downloads.puppetlabs.com/%{name}/%{name}-%{version}.tar.gz
 Source1:        https://downloads.puppetlabs.com/%{name}/%{name}-%{version}.tar.gz.asc
+Source2:        gpgkey-6F6B15509CF8E59E6E469F327F438280EF8D349F.gpg
 Patch0:         shared_cpp_hcon.patch
 
-
-%if 0%{?fedora}
-BuildRequires: boost-devel
-BuildRequires: cmake
-%else
-BuildRequires: boost157-devel
-BuildRequires: cmake3
-%endif
-BuildRequires: openssl-devel
-BuildRequires: yaml-cpp-devel
-BuildRequires: libblkid-devel
-BuildRequires: libcurl-devel
-BuildRequires: gcc-c++ make
-BuildRequires: wget
-BuildRequires: tar
-BuildRequires: gettext
-BuildRequires: leatherman-devel
-BuildRequires: cpp-hocon-devel
-BuildRequires: ruby-devel
+BuildRequires:  gnupg2
+BuildRequires:  cmake%{?cmake_suffix}
+BuildRequires:  make
+BuildRequires:  gcc-c++
+BuildRequires:  libcurl-devel
+BuildRequires:  leatherman-devel
+BuildRequires:  boost%{?boost_suffix}-devel
+BuildRequires:  ruby-devel >= 1.9
+BuildRequires:  yaml-cpp-devel
+BuildRequires:  openssl-devel
+BuildRequires:  libblkid-devel
+BuildRequires:  cpp-hocon-devel
+#BuildRequires:  whereami-devel
 
 # autoreq is not picking this one up so be specific
-Requires: leatherman
+Requires: leatherman%{?_isa}
 
 %package devel
-Requires:  %{name}%{?_isa} = %{version}-%{release}
-Summary: Development libraries for building against facter
+Summary:        Development libraries for building against facter
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %package -n ruby-%{name}
-Requires:  %{name}%{?_isa} = %{version}-%{release}
-Requires: ruby
-Summary: ruby bindings for facter
+Summary:        Ruby bindings for facter
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       ruby%{?_isa}
 
 %description
 Facter is a lightweight program that gathers basic node information about the
@@ -59,32 +60,23 @@ The headers to link against libfacter in other applications.
 The ruby bindings for libfacter.
 
 %prep
+%{gpgverify} --keyring='%{SOURCE2}' --signature='%{SOURCE1}' --data='%{SOURCE0}'
 %autosetup -p1
 
 %build
-%if 0%{?fedora}
-%cmake -DCMAKE_BUILD_TYPE=Debug \
-       -DLIBFACTER_INSTALL_DESTINATION=%{_lib} \
-       -DCMAKE_INSTALL_PREFIX=%{_prefix}
-%else
-%cmake3 -DBOOST_INCLUDEDIR=/usr/include/boost157 \
-        -DBOOST_LIBRARYDIR=%{_libdir}/boost157 \
-        -DLIBFACTER_INSTALL_DESTINATION=%{_lib} \
-        -DCMAKE_BUILD_TYPE=Debug \
-        -DCMAKE_INSTALL_PREFIX=%{_prefix} \
-        -DLeatherman_DIR=%{_libdir}/cmake3/leatherman
-%endif
-%make_build
-# facter hardcode the path to lib, so set it correctly on other platforms
-sed -i 's#set(LIBFACTER_INSTALL_DESTINATION lib)#set(LIBFACTER_INSTALL_DESTINATION %{_lib})#' lib/CMakeLists.txt
+%cmake . -B%{_target_platform} \
+  -DBOOST_INCLUDEDIR=%{_includedir}/boost%{?boost_suffix} \
+  -DBOOST_LIBRARYDIR=%{_libdir}/boost%{?boost_suffix} \
+  -DLeatherman_DIR=%{_libdir}/cmake%{?cmake_suffix}/leatherman \
+  -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+  %{nil}
+%make_build -C %{_target_platform}
 
 %install
-%{make_install}
+%make_install -C %{_target_platform}
 
 %check
-%__make test
-
-%ldconfig_scriptlets
+%make_build -C %{_target_platform} test
 
 %files
 %license LICENSE
@@ -97,12 +89,17 @@ sed -i 's#set(LIBFACTER_INSTALL_DESTINATION lib)#set(LIBFACTER_INSTALL_DESTINATI
 %{_mandir}/man8/%{name}*
 
 %files devel
-%{_includedir}/%{name}
+%{_includedir}/%{name}/
 
 %files -n ruby-%{name}
 %{ruby_vendorlibdir}/%{name}.rb
 
+%ldconfig_scriptlets
+
 %changelog
+* Wed Aug 14 2019 Igor Gnatenko <ignatenkobrain@fedoraproject.org> - 3.14.2-1
+- Update to 3.14.2
+
 * Thu Jul 25 2019 Fedora Release Engineering <releng@fedoraproject.org> - 3.9.3-7
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_31_Mass_Rebuild
 
