@@ -1,6 +1,6 @@
 Name:           facter
 Version:        3.9.3
-Release:        6%{?dist}
+Release:        7%{?dist}
 Summary:        Command and ruby library for gathering system information
 
 License:        ASL 2.0
@@ -103,6 +103,9 @@ sed -i 's#set(LIBFACTER_INSTALL_DESTINATION lib)#set(LIBFACTER_INSTALL_DESTINATI
 %{ruby_vendorlibdir}/%{name}.rb
 
 %changelog
+* Thu Jul 25 2019 Fedora Release Engineering <releng@fedoraproject.org> - 3.9.3-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_31_Mass_Rebuild
+
 * Thu Jan 31 2019 Fedora Release Engineering <releng@fedoraproject.org> - 3.9.3-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_30_Mass_Rebuild
 
