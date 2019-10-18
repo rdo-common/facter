@@ -6,7 +6,7 @@
 
 Name:           facter
 Version:        3.14.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Command and ruby library for gathering system information
 
 License:        ASL 2.0
@@ -110,6 +110,9 @@ The ruby bindings for libfacter.
 %ldconfig_scriptlets
 
 %changelog
+* Fri Oct 18 2019 Richard Shaw <hobbes1069@gmail.com> - 3.14.2-2
+- Rebuild for yaml-cpp 0.6.3.
+
 * Wed Aug 14 2019 Igor Gnatenko <ignatenkobrain@fedoraproject.org> - 3.14.2-1
 - Update to 3.14.2
 
