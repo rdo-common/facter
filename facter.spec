@@ -4,16 +4,23 @@
 %global cmake %%cmake%{?cmake_suffix}
 %endif
 
+%if 0%{?rhel} && 0%{?rhel} >= 7 && !0%{?epel}
+%global has_epoch 1
+%endif
+
+
 Name:           facter
 Version:        3.14.2
 Release:        2%{?dist}
+%if 0%{?has_epoch}
+Epoch:          1
+%endif
 Summary:        Command and ruby library for gathering system information
 
 License:        ASL 2.0
 URL:            https://puppetlabs.com/facter
 Source0:        https://downloads.puppetlabs.com/%{name}/%{name}-%{version}.tar.gz
 Source1:        https://downloads.puppetlabs.com/%{name}/%{name}-%{version}.tar.gz.asc
-Source2:        gpgkey-6F6B15509CF8E59E6E469F327F438280EF8D349F.gpg
 Patch0:         shared_cpp_hcon.patch
 
 BuildRequires:  gnupg2
@@ -35,11 +42,11 @@ Requires: leatherman%{?_isa}
 
 %package devel
 Summary:        Development libraries for building against facter
-Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       %{name}%{?_isa} = %{?has_epoch:1:}%{version}-%{release}
 
 %package -n ruby-%{name}
 Summary:        Ruby bindings for facter
-Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       %{name}%{?_isa} = %{?has_epoch:1:}%{version}-%{release}
 Requires:       ruby%{?_isa}
 
 %description
@@ -60,7 +67,6 @@ The headers to link against libfacter in other applications.
 The ruby bindings for libfacter.
 
 %prep
-%{gpgverify} --keyring='%{SOURCE2}' --signature='%{SOURCE1}' --data='%{SOURCE0}'
 %autosetup -p1
 
 %build
