@@ -6,7 +6,7 @@
 
 Name:           facter
 Version:        3.14.7
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Command and ruby library for gathering system information
 
 License:        ASL 2.0
@@ -110,6 +110,9 @@ The ruby bindings for libfacter.
 %ldconfig_scriptlets
 
 %changelog
+* Wed Jun 03 2020 Jonathan Wakely <jwakely@redhat.com> - 3.14.7-2
+- Rebuild for Boost 1.73.0
+
 * Tue Jan 28 2020 Adam Tkac <vonsch@gmail.com> - 3.14.7-1
 - update to 3.14.7
 
