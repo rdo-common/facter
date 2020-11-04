@@ -6,7 +6,7 @@
 
 Name:           facter
 Version:        3.14.7
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Command and ruby library for gathering system information
 
 License:        ASL 2.0
@@ -15,6 +15,7 @@ Source0:        https://downloads.puppetlabs.com/%{name}/%{name}-%{version}.tar.
 Source1:        https://downloads.puppetlabs.com/%{name}/%{name}-%{version}.tar.gz.asc
 Source2:        gpgkey-6F6B15509CF8E59E6E469F327F438280EF8D349F.gpg
 Patch0:         shared_cpp_hcon.patch
+Patch1:         %{name}-gcc11.patch
 
 BuildRequires:  gnupg2
 BuildRequires:  cmake%{?cmake_suffix}
@@ -110,6 +111,9 @@ The ruby bindings for libfacter.
 %ldconfig_scriptlets
 
 %changelog
+* Wed Nov 04 2020 Jeff Law <law@redhat.com> - 3.14.7-4
+- Fix missing #includes for gcc-11
+
 * Mon Jul 27 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.14.7-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 

@@ -1,0 +1,47 @@
+diff --git a/lib/src/util/bsd/scoped_ifaddrs.cc b/lib/src/util/bsd/scoped_ifaddrs.cc
+index d61d8a4..fbbea6d 100644
+--- a/lib/src/util/bsd/scoped_ifaddrs.cc
++++ b/lib/src/util/bsd/scoped_ifaddrs.cc
+@@ -1,3 +1,4 @@
++#include <cstddef>
+ #include <internal/util/bsd/scoped_ifaddrs.hpp>
+ 
+ using namespace std;
+diff --git a/lib/src/util/posix/scoped_addrinfo.cc b/lib/src/util/posix/scoped_addrinfo.cc
+index 1dc60b4..bf5bf00 100644
+--- a/lib/src/util/posix/scoped_addrinfo.cc
++++ b/lib/src/util/posix/scoped_addrinfo.cc
+@@ -1,3 +1,5 @@
++#include <cstddef>
++
+ #include <internal/util/posix/scoped_addrinfo.hpp>
+ 
+ using namespace std;
+diff --git a/lib/src/util/posix/scoped_bio.cc b/lib/src/util/posix/scoped_bio.cc
+index cdf25d6..dfb7f09 100644
+--- a/lib/src/util/posix/scoped_bio.cc
++++ b/lib/src/util/posix/scoped_bio.cc
+@@ -1,4 +1,5 @@
+ #pragma clang diagnostic ignored "-Wdeprecated-declarations"
++#include <cstddef>
+ #include <internal/util/posix/scoped_bio.hpp>
+ 
+ using namespace std;
+diff --git a/lib/src/util/posix/scoped_descriptor.cc b/lib/src/util/posix/scoped_descriptor.cc
+index 3ba2d4e..7a131d3 100644
+--- a/lib/src/util/posix/scoped_descriptor.cc
++++ b/lib/src/util/posix/scoped_descriptor.cc
+@@ -1,3 +1,4 @@
++#include <cstddef>
+ #include <internal/util/posix/scoped_descriptor.hpp>
+ 
+ using namespace std;
+diff --git a/lib/src/util/scoped_file.cc b/lib/src/util/scoped_file.cc
+index 440d8e3..2369987 100644
+--- a/lib/src/util/scoped_file.cc
++++ b/lib/src/util/scoped_file.cc
+@@ -1,3 +1,4 @@
++#include <cstddef>
+ #include <internal/util/scoped_file.hpp>
+ #include <boost/nowide/cstdio.hpp>
+ 
