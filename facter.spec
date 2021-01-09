@@ -6,7 +6,7 @@
 
 Name:           facter
 Version:        3.14.7
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Command and ruby library for gathering system information
 
 License:        ASL 2.0
@@ -111,6 +111,9 @@ The ruby bindings for libfacter.
 %ldconfig_scriptlets
 
 %changelog
+* Sat Jan  9 2021 ben <code@musicinmybrain.net> - 3.14.7-5
+- Rebuild for cpp-hocon 0.3.0
+
 * Wed Nov 04 2020 Jeff Law <law@redhat.com> - 3.14.7-4
 - Fix missing #includes for gcc-11
 
