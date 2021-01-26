@@ -6,7 +6,7 @@
 
 Name:           facter
 Version:        3.14.7
-Release:        6%{?dist}
+Release:        7%{?dist}
 Summary:        Command and ruby library for gathering system information
 
 License:        ASL 2.0
@@ -111,6 +111,9 @@ The ruby bindings for libfacter.
 %ldconfig_scriptlets
 
 %changelog
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.14.7-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
 * Fri Jan 22 2021 Jonathan Wakely <jwakely@redhat.com> - 3.14.7-6
 - Rebuilt for Boost 1.75
 
